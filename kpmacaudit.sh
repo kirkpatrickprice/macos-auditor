@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright 2021 KirkpatrickPrice, Inc.
+# Copyright 2023 KirkpatrickPrice, Inc.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,21 +16,14 @@
 
 # KirkpatrickPrice *nix Audit Script
 # Author: Randy Bartels (original version by Michael Fowl)
-# Usage example: "sudo ./kpnixaudit.sh" to audit common configs and setting on *nix environments.  Developed and
-# tested against CentOS/RHEL 7 and 8, Amazon Linux 1 and 2 and Ubuntu 1804 and 2004 distributions, but should work
-# reasonably well on similar distributions as long it supports any of the following:
-# Critical dependencies:
-#   - Shell:            Bash (works on MacOS default version)
-#   - Service manager:  launchctl
-#   - Misc. commands:   find, which, "echo -e", awk, uname, sysctl, grep, sw_vers, head, tail, netstat, initctl, launchctl
-#                       svc, auditctl
+# Usage example: "sudo ./kpnixaudit.sh" to audit common configs and setting on MacOS devices.  
 
 # A report titled "hostname".txt will be generated in the working directory.
 # NOTE: The script must be run as ROOT
 
 
 # CHANGELOG
-# Version 0.1:
+# Version 0.1.0 (June 27, 2023):
 #   - Initial version, based significantly on https://github.com/kirkpatrickprice/linux-audit-scripts/kpnixaudit.sh and CIS MacOS 13 Ventura Benchmark v1.0.0 (https://cisecurity.org)
 
 KPMACVERSION="0.0.99"
@@ -46,8 +39,6 @@ function usage () {
         Options:
             -c      Print DumpCmd errors messages to STDERR instead of redirecting them to /dev/null
             -d      Print DEBUG messages to STDOUT and to REPORT_NAME
-            -w      Disable the WorldFiles module (this check can take a long time on systems
-                    with lots of network-attached storage such as NFS mounts).  
             -h      this help
 
         NOTE: This script must be run as ROOT
@@ -889,7 +880,7 @@ if [ "$USER" != "root" ]; then
 fi
 
 #Get the command line options
-while getopts ":cdhkm:w" OPTION; do
+while getopts ":cdh" OPTION; do
     case $OPTION in
         c )
             DEBUGCMD=1
@@ -897,9 +888,6 @@ while getopts ":cdhkm:w" OPTION; do
         d )
             DEBUG=1
             DEBUGCMD=1
-            ;;
-        w )
-            WORLDFILES=0
             ;;
         * )
             usage
