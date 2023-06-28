@@ -16,9 +16,7 @@ All Git Commits are signed to increase reliability that code hasn't been changed
 * Misc. commands:   `find` `which` `echo` `awk` `uname` `sysctl` `grep` `head` `tail` `netstat` `mount`
 * MacOS-specific commands: `dscl` `security` `defaults` `disktuil` `system_profiler` `softwareupdate` `csrutil` `systemsetup`
 
-The script has been tested against MacOS 13.3 Ventura:
-
-It will also likely run well on other MacOS versions so long as the OS version supports the dependencies above.
+The script has been tested against MacOS 13.3 Ventura, but it will also likely run well on other MacOS versions so long as it supports the dependencies above.
 
 ## Installation
 Installation is as simple as copying or cloning the Bash script to your system.
