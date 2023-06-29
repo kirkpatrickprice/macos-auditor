@@ -380,41 +380,6 @@ function redactfile () {
     fi
 }
 
-function svcstatus () {
-    #Determine the correct method of reporting daemon status.  Prefer "systemctl is-enabled <service_name>" but fall back to "service <service_name> status" is systemctl is not available.
-    #Paramaters:
-    #    $1 - Name of service to check
-
-    debug "SvcStatus: $1"
-    local CMD=""
-
-    comment "Checking status: $1"
-
-    #If systemctl is available, use it
-    if [ -n "$(which systemctl 2> /dev/null)" ]; then
-        local CMD="systemctl is-active $1"
-    else
-        #If systemctl is not available, but the service command is, then use it
-        if [ -n "$(which service 2> /dev/null)" ]; then
-            local CMD="service $1 status"
-        fi
-    fi
-
-    #If CMD was set by either condition above, process the results
-    if [ -n "$CMD" ]; then
-        local STATUS="$($CMD 2> /dev/null)"
-        # If STATUS is "blank" (e.g. systemctl or service commands didn't find the service), then set STATUS to "not found"
-        if [ -z "$STATUS" ]; then
-            local STATUS="NOTFOUND"
-        fi
-
-        #Return the results
-        echo -e "$SECTION:: $1_status: $STATUS" >> $REPORT_NAME
-    else
-        comment "Systemctl and service commands not found.  Unable to verify $1 status."
-    fi
-}
-
 function System {
     header "System_Periodic"
         comment "Periodic is the task scheduler, so you can use this to get a list of (and even the contents of) the scheduled tasks running on a system."
@@ -815,32 +780,6 @@ function Users {
 
 
 function WorldFiles {
-    # # This check can take a while.  It's preferred to leave it in place, but if mounting several NFS 
-    # # points or under similar configurations, this can be disabled by running the script with the -w parameter
-    # # or by responding "n" to the following prompt.
-
-    # # If the search for world-readable files hasn't already been disabled by the -w switch, provide an opportunity
-    # # to disable it here.  Wait for 30 seconds and if an "n" was provided, skip the check.
-
-    # comment "This check will report all world-writable files.  Many of these should just be ignored -- everythin in /run, /proc, etc.  But after you filter out those results,"
-    # comment "there might be some interesting things left.  If you see something in /etc, /home, /bin, /usr/bin and other important binary, configuration or user directories, it'll be worth asking the customer about them."
-    # if [ $WORLDFILES -eq 1 ]; then
-    #     echo "Searching for world-writable files.  This check can take a while."
-    #     echo "It's preferred to allow this command to run, but can be skipped if a search of all file systems"
-    #     echo "will cause system problems, such as if there a large number of network-mounted NFS volumes."
-    #     echo ""
-        
-    #     read -t 30 -n 1 -p "Continue with search for world-writable files? (Y/n)"
-    #     case $REPLY in
-    #         [nN] )
-    #             WORLDFILES=0
-    #             ;;
-    #     esac
-    # fi
-
-    echo ""
-
-    # if [ $WORLDFILES -eq 1 ]; then
     header "WorldFiles" 
         echo -e "[*] Finding world writable files, which could take awhile.\n[*] Please wait..."
         comment  "World Writable Files/Directories"
@@ -851,9 +790,6 @@ function WorldFiles {
         done
         SECTION="WorldFiles"
     footer
-    # else
-    #     comment "Search for world-writable files skipped."
-    # fi
 }
 
 clear
