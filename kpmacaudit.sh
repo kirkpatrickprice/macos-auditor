@@ -582,7 +582,7 @@ function Network {
         comment "to determine if the system is currently available as a Windows file share (Network_ListeningServices)."
             dumpcmdgrep "defaults read /Library/Preferences/SystemConfiguration/com.apple.smb.server.plist" "-i" "NetBIOSName\|ServerDescription\|Workgroup"
         SECTION="Network_SharesSamba-SharedFolders"
-        dumpcmd "dscl . -readall /Sharepoints afp_guestacces afp_shared directory_path smb_shared smb_guessaccess smb_createmask smb_directorymask"
+        dumpcmd "dscl . -readall /Sharepoints afp_guestacces afp_shared directory_path smb_shared smb_guessaccess smb_createmask smb_directorymask smb_sealed"
         SECTION="Network_SharesSamba"
     footer
 
@@ -638,9 +638,9 @@ function Logging {
         dumpfile "/etc/security" "*"
     footer
 
-    header "Logging_AuditConfigPermissions"
-        comment "Permissions for the /etc/security directory should be restricted to only the root user.  Ensure that 'w' does not show up for any of these files."
-        dumpcmd "ls -l /etc/security"
+    header "Logging_AuditPermissions"
+        comment "Permissions should be restricted to the local folders where log files are written (/var/log and /var/audit)."
+        dumpcmd "ls -l /private/var"
     footer
 
     header "Logging_Firewall"
@@ -665,6 +665,7 @@ function Logging {
         comment "are installed, then SysLog will need to do it.  Check for lines with an @ sign."
         comment "Default logging facility for recent Ubuntu and CentOS installations"
         dumpfile "/etc" "syslog.conf"
+        dumpfile "/etc" "asl.conf"
     footer
 
     header "Logging_Samples" 
