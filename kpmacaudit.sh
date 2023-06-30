@@ -26,7 +26,7 @@
 # Version 0.1.0 (June 27, 2023):
 #   - Initial version, based significantly on https://github.com/kirkpatrickprice/linux-audit-scripts/kpnixaudit.sh and CIS MacOS 13 Ventura Benchmark v1.0.0 (https://cisecurity.org)
 
-KPMACVERSION="0.0.99"
+KPMACVERSION="0.1.0"
 
 function usage () {
     echo "
@@ -753,7 +753,7 @@ function Users {
         for USERNAME in $(dscl . list /Users); do
             if ! [[ "$USERNAME" =~ $IGNORE_USERS ]]; then
                 SECTION="$BASE_SECTION-$USERNAME-Enabled"
-                dumpcmd "sudo -u $USERNAME defaults read com.apple.assistant.support.plist 'Assistant Enabled'"
+                dumpcmd "sudo -u $USERNAME defaults read com.apple.assistant.support.plist"
                 SECTION="$BASE_SECTION-$USERNAME-Config"
                 dumpcmd "sudo -u $USERNAME defaults read com.apple.Siri.plist"
             fi
@@ -787,7 +787,7 @@ function WorldFiles {
         DIRS=('/System/Volumes/Data/System' '/Applications' '/System/Data/System/Library')
         for d in ${DIRS[*]}; do 
             SECTION="WorldFiles-$d"
-            dumpcmd "find $d -type d -perm -2 -ls"
+            dumpcmd "find $d -perm -2 -ls"
         done
         SECTION="WorldFiles"
     footer
