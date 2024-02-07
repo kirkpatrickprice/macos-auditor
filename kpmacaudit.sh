@@ -16,7 +16,7 @@
 
 # KirkpatrickPrice *nix Audit Script
 # Author: Randy Bartels (original version by Michael Fowl)
-# Usage example: "sudo ./kpnixaudit.sh" to audit common configs and setting on MacOS devices.  
+# Usage example: "sudo ./kpnixaudit.sh" to audit common configs and setting on MacOS devices.
 
 # A report titled "hostname".txt will be generated in the working directory.
 # NOTE: The script must be run as ROOT
@@ -71,7 +71,7 @@ function footer () {
     #Print a closing footer message for each testing group
     #Parameters:
     #   None (inherit $SECTION from "heading" function)
-    
+
     echo -e "#[END]: $SECTION" >> $REPORT_NAME
     echo -e ''$_{1..50}'#' >> $REPORT_NAME
     echo -e ''$_{1..50}'#' >> $REPORT_NAME
@@ -82,7 +82,7 @@ function comment () {
     #Print comment lines preceded by "###" to make them easy to find (and grep out) when analyzing the results
     #Parameters:
     #   $1 - Comment to insert into report
-    
+
     echo -e "###$1" 2>/dev/null >> $REPORT_NAME
 }
 
@@ -96,11 +96,11 @@ function dumpcmd () {
 
     local COMMAND_ROOT="$(echo -e "$1" | awk '{ print $1 }')"
     local COMMAND_PATH="$(which $COMMAND_ROOT 2> /dev/null)"
-    
+
     debug "DumpCmd: $COMMAND_ROOT==>$COMMAND_PATH"
 
     if [ -n "$COMMAND_PATH" ]; then
-        if [ $DEBUGCMD = 0 ]; then 
+        if [ $DEBUGCMD = 0 ]; then
             local RESULTS=$(${1} 2> /dev/null)
         else
             local RESULTS=$(${1})
@@ -115,7 +115,7 @@ function dumpcmd () {
 
 function dumpcmdForEachUser () {
     # A function to iterate through system users to gather some piece of user-specific data (probably through the 'defaults' command)
-    # It will automatically append the user's name to the section heading before calling dumpcmd 
+    # It will automatically append the user's name to the section heading before calling dumpcmd
     #   $1 - The command to run
 
     local USERNAME
@@ -125,7 +125,7 @@ function dumpcmdForEachUser () {
             SECTION="$ORIG_SECTION-$USERNAME"
             dumpcmd "sudo -u $USERNAME $1"
         fi
-    done; 
+    done;
     SECTION=$ORIG_SECTION
 }
 
@@ -140,11 +140,11 @@ function dumpcmdgrep {
 
     local COMMAND_ROOT=$(echo -e "$1" | awk '{ print $1 }')
     local COMMAND_PATH=$(which $COMMAND_ROOT 2> /dev/null)
-    
+
     debug "DumpCmd: $COMMAND_ROOT==>$COMMAND_PATH"
 
     if [ -n "$COMMAND_PATH" ]; then
-        if [ $DEBUGCMD = 0 ]; then 
+        if [ $DEBUGCMD = 0 ]; then
             local RESULTS=$(${1} 2> /dev/null | grep $2 "$3")
         else
             local RESULTS=$(${1}) | grep $2 "$3"
@@ -167,10 +167,10 @@ function dumpfile () {
     #       - "0" will only search the starting point passed in $1 / it won't find any files matched in $2 / DO NOT USE
     #       - "1" will search the current <path> in $1 but not recurse any directories
     #       - "2" will search the current path in $1 plus one more level of directies under that...
-    #       - "3" and so on... 
+    #       - "3" and so on...
 
     debug "Dumpfile: $1 $2 $3"
-        
+
     if [ -n "$3" ]; then
         #If provided, set MAXDEPTH to $3
         local MAXDEPTH="$3"
@@ -178,14 +178,14 @@ function dumpfile () {
         #If not provided, assume MAXDEPTH is 1 (see function comments above for interpretation)
         local MAXDEPTH="1"
     fi
-    
+
     debug "Dumpfile: $1 $2 $MAXDEPTH"
 
     if [ -d "$1" ]; then
         for n in $(find -L $1 -maxdepth $MAXDEPTH -type f -iname "$2"); do
             debug "Find: $n"
             comment "File contents: $n"
-            
+
             # Use awk to format each line as SECTION::FILENAME::LINE
             awk \
                 -v vSECTION="$SECTION" \
@@ -210,7 +210,7 @@ function dumpgrep () {
     #       - "0" will only search the starting point passed in $1 / it won't find any files matched in $2 / DO NOT USE
     #       - "1" will search the current <path> in $1 but not recurse any directories
     #       - "2" will search the current path in $1 plus one more level of directies under that...
-    #       - "3" and so on... 
+    #       - "3" and so on...
 
     local FILE
     local PATTERN=$1
@@ -229,7 +229,7 @@ function dumpgrep () {
 
     for FILE in $(find -L $SEARCHPATH -maxdepth $MAXDEPTH -type f -iname "$FILESPEC" | sort); do
         case $FILE in
-            *.gz ) 
+            *.gz )
                 local CMD="zgrep"
                 ;;
             * )
@@ -239,14 +239,14 @@ function dumpgrep () {
 
         comment "Running: $CMD \"$PATTERN\" $FILE"
         debug "Running: $CMD \"$PATTERN\" $FILE"
-        
+
         local COMMAND_ROOT="$(echo -e "$CMD" | awk '{ print $1 }')"
         local COMMAND_PATH="$(which $COMMAND_ROOT 2> /dev/null)"
-        
+
         debug "DumpCmd: $COMMAND_ROOT==>$COMMAND_PATH"
 
         if [ -n "$COMMAND_PATH" ]; then
-            if [ $DEBUGCMD = 0 ]; then 
+            if [ $DEBUGCMD = 0 ]; then
                 local RESULTS="$($CMD "$PATTERN" "$FILE" 2> /dev/null)"
             else
                 local RESULTS="$($CMD "$PATTERN" "$FILE")"
@@ -279,7 +279,7 @@ function getInstalledApps () {
     local FOLDERS=( /Applications /System /Users )
     comment "Running: find ${FOLDERS[*]} -iname '*.app' -type d 2>/dev/null | grep -v /Contents/"
     echo -e "[*] Enumerating installed applications, which could take a while.\n[*] Please wait..."
-    RESULTS=$(find ${FOLDERS[*]} -iname '*.app' -type d 2>/dev/null | grep -v /Contents/)    
+    RESULTS=$(find ${FOLDERS[*]} -iname '*.app' -type d 2>/dev/null | grep -v /Contents/)
     echo "$RESULTS" | awk -v vSECTION=$SECTION '{ printf "%s::%s\n",vSECTION,$0; }' >> $REPORT_NAME
 }
 
@@ -404,7 +404,7 @@ function System {
         SECTION="System_FSEncryption"
     footer
 
-    header "System_FSMounts" 
+    header "System_FSMounts"
         comment "This will collect a list of all file system mounts.  Sometimes, for instance, the backups are written to a remote NFS server.  In this case, the mount point will be listed here."
         SECTION='System_FSMounts-mounts'
             dumpcmd "mount"
@@ -413,12 +413,12 @@ function System {
         SECTION='System_FSMounts'
     footer
 
-    header "System_KernelSysctlRunningConfig" 
+    header "System_KernelSysctlRunningConfig"
         comment "This section collects the RUNNING status for various kernel parameters.  Most of these details are probably not useful in most audits, but they're here if you need them."
         dumpcmd "sysctl -a"
     footer
 
-    header "System_InstalledApps" 
+    header "System_InstalledApps"
         comment "This section collects a list of installed applications.  It includes apps installed as .app folders in the typical MacOS way, as well as Brew-installed apps"
         comment "Brew is popular software management tool to install software that's not readily available through Apple-managed channels"
         SECTION="System_InstalledApps-MacOS"
@@ -426,7 +426,7 @@ function System {
         #getInstalledApps
         dumpcmd "system_profiler SPApplicationsDataType"
         SECTION="System_InstalledApps-Brew"
-        dumpcmdForEachUser "brew list --versions"        
+        dumpcmdForEachUser "brew list --versions"
         SECTION="System_InstalledApps"
     footer
 
@@ -454,11 +454,11 @@ function System {
         SECTION="System_PendingUpdates-Brew"
         # NOTE: The brew command includes the "-n" option to simulate the upgrade process, without actually performing it.  It results in a list of things that /would be/ updated.
         SECTION="System_PendingUpdates-Brew"
-        dumpcmdForEachUser "brew upgrade -n"        
+        dumpcmdForEachUser "brew upgrade -n"
         SECTION="System_PendingUpdates"
     footer
 
-    header "System_RunningProcesses" 
+    header "System_RunningProcesses"
         comment "This is as good as a blood test at the doctor's office.  If it's not listed here, the process isn't running. You can use it to find running"
         comment "anti-virus daemons, web servers, productivity software, and just about everything else."
         dumpcmd "ps -ef"
@@ -469,7 +469,7 @@ function System {
         comment "For network-accessible servers, see \"Network_ListeningServices\" below."
         comment "In this list, if there's a number in the first field, it means the service is currently running."
         SECTION="System_ServiceInfo"
-            dumpcmd "launchctl list"        
+            dumpcmd "launchctl list"
     footer
 
     header "System_IntegrityProtection"
@@ -496,7 +496,7 @@ function System {
 }
 
 function Network {
-    header "Network_ConnectivityTest" 
+    header "Network_ConnectivityTest"
         comment "A quick PING test to google.com.  On a PCI audit, ideally this would fail from systems in the CDE (not necessarily those that are \"connected to\")."
         comment "If it doesn't, it's worth a conversation as all inbound and outbound communication must be explicitly defined for the CDE."
         comment "If it's not a PCI audit, you can decide if this is helpful to you."
@@ -504,7 +504,7 @@ function Network {
             dumpcmd "ping -c4 www.google.com"
     footer
 
-    header "Network_DNSResolver" 
+    header "Network_DNSResolver"
         comment "We collect the DNS resolver configuration.  Using an external resolver (e.g. 8.8.8.8 for Google) could open up some interesting attack vectors through DNS poisoning."
         comment "It's also interesting to note if there are any differences across the sample population as differences could be indicative of systems under differing levels of management."
         dumpfile "/etc" "resolv.conf"
@@ -525,7 +525,7 @@ function Network {
         dumpcmd "system_profiler SPFirewallDataType"
     footer
 
-    header "Network_InterfacesSummary" 
+    header "Network_InterfacesSummary"
         comment "We collect the MacOS Interface Summary which includes useful information about each interface (including IP addresses)."
         dumpcmd "system_profiler SPNetworkDataType"
         # BASE_SECTION=$SECTION
@@ -536,7 +536,7 @@ function Network {
         # SECTION=$BASE_SECTION
     footer
 
-    header "Network_ListeningServices" 
+    header "Network_ListeningServices"
         comment "We list all of the listening ports, including the binary that's listening on it.  I consider \"System_RunningProcesses\", \"System_PackageManagerUpdates\","
         comment "and this section to be three most-valuable sections in the report."
         dumpcmdgrep "lsof -i -P" "-e" "LISTEN"
@@ -557,12 +557,12 @@ function Network {
             dumpfile "/etc/ssh/ssh_config.d" "*"
     footer
 
-    header "Network_RouteTable" 
+    header "Network_RouteTable"
         comment "This is probably only useful if you end up having to chase down something wonky in the network routing table.  But, we collect it just in case you might need it."
         dumpcmd "netstat -rn"
     footer
-    
-    header "Network_SharesNFS" 
+
+    header "Network_SharesNFS"
         comment "These configurations drive whether or not this server is providing network file sharing services."
         comment "The Network File System (NFS) is common in Unix/Linux-only environments where SMB compatability is not needed for access to/from Windows systems"
         comment "MacOS can run an NFS server as nfsd and the directories that will be shared are listed in /etc/exports"
@@ -576,8 +576,8 @@ function Network {
         comment "/etc/exports -- File systems/directories exported as NFS mount points that other systems can connect to."
             dumpfile "/etc" "exports"
     footer
-    
-    header "Network_SharesSamba" 
+
+    header "Network_SharesSamba"
         comment "MacOS SMB configuration settings if the device is configured with File Sharing.  Also be sure to check if the device is listening on port 445/tcp"
         comment "to determine if the system is currently available as a Windows file share (Network_ListeningServices)."
             dumpcmdgrep "defaults read /Library/Preferences/SystemConfiguration/com.apple.smb.server.plist" "-i" "NetBIOSName\|ServerDescription\|Workgroup"
@@ -586,15 +586,15 @@ function Network {
         SECTION="Network_SharesSamba"
     footer
 
-    header "Network_EtcHosts" 
+    header "Network_EtcHosts"
         comment "/etc/hosts -- local name-to-IP mapping.  Entries in this file generally tend to override DNS lookup or any other name-to-IP mapping."
             dumpfile "/etc" "hosts"
     footer
 
-    header "Network_SNMPInfo" 
+    header "Network_SNMPInfo"
         comment "We collect the SNMP configuration.  Of particular interest here is the permissions granted to each community strings -- could be read-only or read-write."
         comment "Read-write should be used sparingly if at all.  Even read-only can be interesting if it's using SNMPv2 -- which can't do encryption -- or SNMPv3 without crypto."
-        comment "Also check Network_ListeningServices for any listener on 161/udp to determine if the SNMP agent is active."        
+        comment "Also check Network_ListeningServices for any listener on 161/udp to determine if the SNMP agent is active."
         dumpfile "/etc/snmp" "snmpd.conf"
     footer
 
@@ -615,12 +615,12 @@ function Network {
 }
 
 function Logging {
-    header "Logging_AuditdStatus" 
+    header "Logging_AuditdStatus"
         comment "AuditD performs kernel-level logging.  It can generate a lot of data and requires special tools to make the most sense out of the output, so we only grab the configs and none of the events."
         comment "According to CIS Benchmarks, the correct response below is that auditd shows up in the list."
         dumpcmdgrep "launchctl list" "-e" "auditd"
     footer
-    
+
     header "Logging_InstallLog"
         comment "macOS writes information pertaining to system-related events to the file /var/log/install.log.  The retention period for this log file is set in the /etc/asl/com.apple.install configuration file."
         comment "Specifically, we want to see a 'ttl=365' or greater.  We do NOT want to see 'all_max=' followed by a file size (default all_max=50mb)."
@@ -659,7 +659,7 @@ function Logging {
             getOsaUserDefault "com.apple.security.alf" "loggingoption"
         SECTION="Logging_Firewall"
     footer
-    
+
     header "Logging_SyslogConfig"
         comment "A common check here is to make sure that logs are shipped to an external, centralized log server.  OSSEC or another tool might also capture the logs, but if none of those"
         comment "are installed, then SysLog will need to do it.  Check for lines with an @ sign."
@@ -668,14 +668,14 @@ function Logging {
         dumpfile "/etc" "asl.conf"
     footer
 
-    header "Logging_Samples" 
+    header "Logging_Samples"
         comment "A full list of the /var/log sub-directory.  Below, we grab samples of some of the common ones, but if any of these other log files look interesting, you'll need to request those separately"
         SECTION="Logging_SamplesVarLogList"
             dumpcmd "find /var/log"
 
         comment "We collect samples of various logs below.  To save space, we collect only the first and last 25 lines of each file to confirm that events were and continue to be written to the logs."
         comment "If you need to see more of some log files, you'll need to ask for those separately"
-        
+
         #Setup an array of log files (under /var/log) that we'll loop through below
         ITEMS=(system.log install.log alf.log appfirewall.log)
 
@@ -698,7 +698,7 @@ function Users {
         comment "  shadowhash - local authentication source"
         dumpcmd "dscl . -list /Config"
     footer
-    
+
     header "Users_HomeFolders"
         comment "This list provides the permissions for all folders under the /Users directories.  Only the user should have permissions to their own folder, so pay special attention to 'group' and 'other' permissions."
         comment "Ideally, \"drwx------\" or \"drwx--x--x\" is what you should see."
@@ -708,7 +708,7 @@ function Users {
     header "Users_PasswordPolicy"
         comment "This is the password policy for locally-defined accounts.  Note: MacOS can also be joined to an Active Directory domain, in which case the relevant policy from AD will apply but only to those specific users.  See Users_ADConfig for those details."
         getPWPolicy
-        
+
     header "Users_LocalUsers"
         comment "A list of all locally-defined users.  You can safely disregard any user with \"/usr/bin/false\" or \"/sbin/nologin\" as they can't login.  But any user with other shells is fair game."
         dumpcmd "dscl . -readall /Users RecordName UniqueID NFSHomeDirectory UserShell"
@@ -728,12 +728,12 @@ function Users {
         comment "  1+ - Enabled"
         dumpcmdgrep "dscl . -read /Users/Root AuthenticationAuthority" "-c" "ShadowHash\|Kerberos"
     footer
-    
+
     header "Users_AdminScreenSaverBypass"
         comment "If enabled, an administrative user on a MacOS device can bypass the screensaver lock of another user"
         dumpcmdgrep "security authorizationdb read system.login.screensaver" "-c" "use-login-window-ui"
-    
-    header "Users_SudoersConfig" 
+
+    header "Users_SudoersConfig"
         comment "The Sudoers config determines which users and groups can execute commands as ROOT by prefacing the command with \"sudo <command\"."
         comment "See https://xkcd.com/149/ for a visual reference of the effect that the SUDO command has and https://www.linux.com/training-tutorials/configuring-linux-sudoers-file/ for a more detailed explanation."
         dumpfile "/etc" "sudoers"
@@ -741,11 +741,11 @@ function Users {
         dumpfile "/etc" "sudo.conf"
     footer
 
-    header "Users_AuthorizedKeys" 
+    header "Users_AuthorizedKeys"
         comment "The presence of a user's .ssh/authorized_keys file indicates the potential to login via SSH.  This would override the LOCKED status results of the Users_UserStatus check later in the script."
         dumpcmd "ls -1 /Users/*/.ssh/authorized_keys"
     footer
-    
+
     header "Users_SiriStatus"
         comment "Siri can be enabled on a MacOS system just like on the iPhone.  This section identifies if Siri is enabled and, if so, the settings are also displayed"
         comment "Siri is enabled if a '1' is returned in the '-Enabled' result below.  Otherwise (blank or 0), it's disabled."
@@ -757,7 +757,7 @@ function Users {
                 SECTION="$BASE_SECTION-$USERNAME-Config"
                 dumpcmd "sudo -u $USERNAME defaults read com.apple.Siri.plist"
             fi
-        done; 
+        done;
         SECTION=$BASE_SECTION
     footer
 
@@ -781,11 +781,11 @@ function Users {
 
 
 function WorldFiles {
-    header "WorldFiles" 
+    header "WorldFiles"
         echo -e "[*] Finding world writable files, which could take awhile.\n[*] Please wait..."
         comment  "World Writable Files/Directories"
         DIRS=('/System/Volumes/Data/System' '/Applications' '/System/Data/System/Library')
-        for d in ${DIRS[*]}; do 
+        for d in ${DIRS[*]}; do
             SECTION="WorldFiles-$d"
             dumpcmd "find $d -perm -2 -ls"
         done
@@ -849,7 +849,7 @@ echo "System Full Name: $FANCY_HOSTNAME" >> $REPORT_NAME
 echo -e ''$_{1..50}'+' 2> /dev/null >> $REPORT_NAME
 
 # Always run this check to give context to the system we're looking at
-header "System_VersionInformation" 
+header "System_VersionInformation"
     comment "Collecting some basic information about the system.  Take a look through this section to find the string (it varies from RPM-based and Debian-based distros) that will let you see"
     comment "in one list which OS types and versions are in use.  You can use that to check online to make sure that all OSes in use are still supported by the vendor."
     dumpcmd "uname -a"
