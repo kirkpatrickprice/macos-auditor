@@ -32,7 +32,7 @@ function usage () {
     echo "
     $(basename $0) Version ${KPMACVERSION}
 
-    Creates a text file in ~/<hostname>.txt with system configuraiton information needed to audit Linux systems
+    Creates a text file in ~/<hostname>.txt with system configuration information needed to audit Linux systems
 
     USAGE:
         $(basename $0) [ -cdhw ]
@@ -131,7 +131,7 @@ function dumpcmdForEachUser () {
 
 function dumpcmdgrep {
     # A function to process a command's results through grep to filter specific results
-        #$1 comamnd to run
+        #$1 command to run
         #$2 grep options (e.g. -c, -o, etc)
         #$3 filter criteria
 
@@ -318,7 +318,7 @@ function getPWPolicy () {
 }
 
 function getSubString () {
-    #Function to search the global STRING variable to find the substring when provided with the following paramaters:
+    #Function to search the global STRING variable to find the substring when provided with the following parameters:
     #    $1 - Prefix string (include any glob characters such as *<text>)
     #    $2 - Suffix string (include any glob characters such as <text>*)
     #All text between and exclusive of PREFIX and SUFFIX will be put back into the SUBSTRING global variable
@@ -464,7 +464,7 @@ function System {
         dumpcmd "ps -ef"
     footer
 
-    header "System_ServiceInfo" "Backgroun"
+    header "System_ServiceInfo" "Background"
         comment "This section attempts to get the status of all of the running services on a system.  MacOS services are more OS feature-related than how we use the same term in Linxu (network-accessible servers)"
         comment "For network-accessible servers, see \"Network_ListeningServices\" below."
         comment "In this list, if there's a number in the first field, it means the service is currently running."
@@ -513,7 +513,7 @@ function Network {
     header "Network_FirewallStatus"
         comment "MacOS' ALF (Application Level Firewall?) is the built-in desktop firewall for the system.  This section provides the basic status information,"
         comment "but if you want to see the rules, you'll want to inspect those separately."
-        comment "We'll use the system_profiler command to get the data in a standard, and human-readble, format."
+        comment "We'll use the system_profiler command to get the data in a standard, and human-readable, format."
         #comment "The actual setting could be controlled in either of two files, so we'll grab them both."
         # Commented out on 6/22/2023 in favor of the system_profiler reporting method
         # BASE_SECTION=$SECTION
@@ -564,7 +564,7 @@ function Network {
 
     header "Network_SharesNFS"
         comment "These configurations drive whether or not this server is providing network file sharing services."
-        comment "The Network File System (NFS) is common in Unix/Linux-only environments where SMB compatability is not needed for access to/from Windows systems"
+        comment "The Network File System (NFS) is common in Unix/Linux-only environments where SMB compatibility is not needed for access to/from Windows systems"
         comment "MacOS can run an NFS server as nfsd and the directories that will be shared are listed in /etc/exports"
 
         #Get the status of the NFS server
@@ -767,7 +767,7 @@ function Users {
     footer
 
     header "Users_PasswordHints"
-        comment "Passowrd hints should not be used as they are often directly related to the user's password and even when they're not, they're still just another form of \"someting you know\" and do regularly meet the password complexity requirements."
+        comment "Password hints should not be used as they are often directly related to the user's password and even when they're not, they're still just another form of \"something you know\" and do regularly meet the password complexity requirements."
         comment "This section shows if hints are displayed on the login screen.  The value should 0."
         getOsaUserDefault "com.apple.loginwindow" "RetriesUntilHint"
     footer
