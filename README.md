@@ -2,7 +2,7 @@
 
 This script is used by KirkpatrickPrice auditors to collect information from MacOS devices.  Unlike many other tools out there, the approach used in this script is "keep it lite":
 * Keep it simple -- there is only one file that is needed -- `kpmacaudit.sh`.  Everything runs from there.
-* Keep it simple -- the script tries not to use any crazy Bash-fu.  Comments are embedded througout to facilitate source code review for interested personnel prior to running it on your device
+* Keep it simple -- the script tries not to use any crazy Bash-fu.  Comments are embedded throughout to facilitate source code review for interested personnel prior to running it on your device
 * Use only commands that are already built into the operating system (no Python, Perl, jq, etc required)
 * Minimal real-time analysis -- we collect data for off-line analysis and don't report findings during data collection.  This keeps the dependencies to a minimum and the logic simple, especially important for running the script on production machines.
 * Fail quietly -- If a command isn't found or the piece of software isn't installed, note that in the output and keep going
@@ -72,7 +72,7 @@ If you're unfamiliar with the Linux/MacOS command line, the following steps will
 The end result is a text file named as `<computername>.txt` in each user's Home folder.  Collect all of the files from the identified sample and save them in a ZIP.  Upload the ZIP file to the Online Audit Manager portal.
 
 ## Rarely Needed
-There are some options to facilitate troublshooting, but they should rarely be needed and only used under KP advisement.
+There are some options to facilitate troubleshooting, but they should rarely be needed and only used under KP advisement.
 ```
 USAGE:
         kpmacaudit.sh [ -cdh ]
